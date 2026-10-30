@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Smart Bookmark - Game Edition</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;800;900&display=swap');
+
+    :root {
+      --bg-color: #0d0f1d;
+      --card-bg: #181d30;
+      --card-border: #2d3553;
+      --primary: #ff3b00;
+      --primary-yellow: #ffcc00;
+      --primary-cyan: #00f0ff;
+      --text-main: #ffffff;
+      --text-muted: #8b9bb4;
+      --success: #00ff88;
+      --danger: #ff4d4d;
+      --stroke-dark: #000000;
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+    }
+
+    body {
+      width: 340px;
+      margin: 0;
+      padding: 18px;
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      background: var(--bg-color);
+      color: var(--text-main);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bg-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .bg-blob {
+      position: absolute;
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      filter: blur(40px);
+      opacity: 0.3;
+      animation: floatBlob 8s infinite alternate ease-in-out;
+    }
+
+    .blob-1 { top: -20px; left: -20px; background: var(--primary); }
+    .blob-2 { bottom: -20px; right: -20px; background: var(--primary-cyan); animation-delay: -4s; }
+
+    @keyframes floatBlob {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(20px, 15px) scale(1.1); }
+    }
+
+    .app-container {
+      position: relative;
+      z-index: 1;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .game-badge {
+      background: var(--primary-yellow);
+      color: #000;
+      font-weight: 900;
+      font-size: 10px;
+      padding: 3px 6px;
+      border-radius: 6px;
+      border: 2px solid #000;
+      box-shadow: 2px 2px 0px #000;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .header h3 {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #fff 30%, var(--primary-cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 0.5px;
+    }
+
+    .save-card {
+      background: var(--card-bg);
+      border: 3px solid var(--stroke-dark);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 5px 5px 0px var(--stroke-dark), 0 0 15px rgba(0, 240, 255, 0.1);
+      position: relative;
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .save-card::after {
+      content: '';
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--primary-cyan);
+      box-shadow: 0 0 8px var(--primary-cyan);
+    }
+
+    .input-group {
+      margin-bottom: 12px;
+    }
+
+    .input-group label {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px 12px;
+      background: #0b0e19;
+      border: 2px solid var(--card-border);
+      border-radius: 10px;
+      font-size: 12px;
+      font-family: inherit;
+      font-weight: 600;
+      color: var(--text-main);
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--primary-cyan);
+      box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.2);
+    }
+
+    /* Nút Bấm 3D Cartoon / Game Button Effect */
+    .btn-game {
+      width: 100%;
+      padding: 12px;
+      margin-top: 4px;
+      background: linear-gradient(180deg, #ff5500 0%, var(--primary) 100%);
+      color: #ffffff;
+      border: 3px solid #000;
+      border-radius: 12px;
+      font-family: inherit;
+      font-weight: 900;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      cursor: pointer;
+      box-shadow: 0 5px 0 #801d00, 0 8px 10px rgba(0, 0, 0, 0.4);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.1s ease;
+    }
+
+    .btn-game:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 7px 0 #801d00, 0 10px 15px rgba(255, 59, 0, 0.3);
+    }
+
+    .btn-game:active {
+      transform: translateY(4px);
+      box-shadow: 0 1px 0 #801d00, 0 3px 5px rgba(0, 0, 0, 0.4);
+    }
+
+    .btn-delete {
+      background: linear-gradient(180deg, #ff6b6b 0%, var(--danger) 100%);
+      box-shadow: 0 5px 0 #991b1b, 0 8px 10px rgba(0, 0, 0, 0.4);
+    }
+    .btn-delete:hover { box-shadow: 0 7px 0 #991b1b, 0 10px 15px rgba(255, 77, 77, 0.3); }
+    .btn-delete:active { box-shadow: 0 1px 0 #991b1b; }
+
+    .btn-edit {
+      background: linear-gradient(180deg, #fbbf24 0%, #f59e0b 100%);
+      color: #000;
+      box-shadow: 0 5px 0 #b45309, 0 8px 10px rgba(0, 0, 0, 0.4);
+    }
+    .btn-edit:hover { box-shadow: 0 7px 0 #b45309, 0 10px 15px rgba(245, 158, 11, 0.3); }
+    .btn-edit:active { box-shadow: 0 1px 0 #b45309; }
+
+    .btn-secondary {
+      background: linear-gradient(180deg, #2d3553 0%, #1e253b 100%);
+      color: var(--text-main);
+      box-shadow: 0 4px 0 #111524, 0 6px 10px rgba(0, 0, 0, 0.3);
+      margin-top: 14px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .save-card.flash {
+      animation: gamePop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border-color: var(--success);
+      box-shadow: 5px 5px 0px var(--stroke-dark), 0 0 25px rgba(0, 255, 136, 0.4);
+    }
+
+    @keyframes gamePop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.04) rotate(-1deg); }
+      100% { transform: scale(1); }
+    }
+
+    .toast {
+      display: none;
+      margin-top: 12px;
+      background: #000;
+      border: 2px solid var(--success);
+      color: var(--success);
+      padding: 10px;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      text-align: center;
+      box-shadow: 3px 3px 0px var(--stroke-dark);
+      animation: bounceIn 0.3s ease;
+    }
+
+    @keyframes bounceIn {
+      0% { transform: translateY(10px) scale(0.9); opacity: 0; }
+      100% { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    .icon-svg {
+      width: 16px;
+      height: 16px;
+      vertical-align: middle;
+      fill: currentColor;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-container">
+    <div class="bg-blob blob-1"></div>
+    <div class="bg-blob blob-2"></div>
+  </div>
+
+  <div class="app-container">
+    <div class="header">
+      <div class="header-title">
+        <svg class="icon-svg" style="color: var(--primary-yellow); width:20px; height:20px;" viewBox="0 0 24 24">
+          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+        </svg>
+        <h3>Smart Bookmark</h3>
+      </div>
+      <span class="game-badge">v2.0</span>
+    </div>
+    
+    <div id="save-box" class="save-card">
+      <div class="input-group">
+        <label>Tiêu đề trang</label>
+        <div class="input-wrapper">
+          <input type="text" id="page-title" placeholder="Tên trang web...">
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>Đường dẫn URL</label>
+        <div class="input-wrapper">
+          <input type="text" id="page-url" placeholder="https://...">
+        </div>
+      </div>
+
+      <!-- Nút Lưu (Chỉ hiện khi chưa bookmark) -->
+      <button id="btn-save" class="btn-game">
+        💾 Lưu Bookmark Ngay
+      </button>
+
+      <!-- Cụm nút Xóa / Cập nhật (Chỉ hiện khi đã bookmark) -->
+      <div id="action-buttons-group" class="hidden" style="display: flex; gap: 8px; margin-top: 4px;">
+        <button id="btn-update" class="btn-game btn-edit" style="flex: 1;">✏️ Cập Nhật</button>
+        <button id="btn-delete" class="btn-game btn-delete" style="flex: 1;">🗑️ Xóa Link</button>
+      </div>
+    </div>
+
+    <button id="btn-open-manager" class="btn-game btn-secondary">
+      📋 Mở Trang Quản Lý
+    </button>
+
+    <div id="toast" class="toast">⚡ THÀNH CÔNG!</div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
